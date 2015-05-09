@@ -1,12 +1,22 @@
 import sys
 import time
+import sqlite3
+conn = sqlite3.connect('facebook.db')
+c = conn.cursor()
+from questionToSQL import extractQuery  
 
 GLOBAL = 0
 semanticDictionary = {'birthday':'entity','name':'entity','education':'entity','athletes':'person','hometown':'entity','music':'adj_entity','sports':'adj_entity','books':'adj_entity','movies':'adj_entity','team':'adj_entity'}
 category = {'A':{'birthday':0,'name':0,'education':0,'athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'team':0},'B':{'birthday':0,'name':0,'education':0,'athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'team':0}}
 
 def getAnswer(current_question,questioning_user):
-    return"answer"
+    querySet = extractQuery(current_question,questioning_user) 
+    for query in querySet:
+        resultSet = c.execute(query)
+        if resultSet :
+            return(str(resultSet))
+    #print(querySet)   
+    #return querySet
     
 def toggle(questioning_user,answering_user):
     temp = questioning_user
@@ -46,8 +56,8 @@ def getNextQuestionAndCategory():
             current_question = 'which is your favourite ' + current_category+' ?'
             return current_question,current_category
         
-def getAnswer(current_question,answering_user):
-    return 'answer'
+##def getAnswer(current_question,answering_user):
+##    return 'answer'
  
 def start():
     global category
