@@ -4,17 +4,24 @@ import sqlite3
 conn = sqlite3.connect('facebook.db')
 c = conn.cursor()
 from questionToSQL import extractQuery  
+import copy
 
 GLOBAL = 0
 semanticDictionary = {'birthday':'entity','name':'entity','education':'entity','athletes':'person','hometown':'entity','music':'adj_entity','sports':'adj_entity','books':'adj_entity','movies':'adj_entity','team':'adj_entity'}
-category = {'A':{'birthday':0,'name':0,'education':0,'athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'team':0},'B':{'birthday':0,'name':0,'education':0,'athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'team':0}}
+flagDict = {'birthday':0,'name':0,'education':0,'athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'team':0} 
+
 
 def getAnswer(current_question,questioning_user):
+    """
+    This takes the current question being asked and the user to which the question is being referred as input.It then calls the extractQuery function from questionToSQL file to get the equivalent SQL queries for the question.It then executes these quesries to get the data from the sqlite database and returns the result back.
+    """
     querySet = extractQuery(current_question,questioning_user) 
     for query in querySet:
+        print(query)
         resultSet = c.execute(query)
-        if resultSet :
-            return(str(resultSet))
+        result = resultSet.fetchone() 
+        if result :
+            return(str(result[0]))
     #print(querySet)   
     #return querySet
     
@@ -24,13 +31,6 @@ def toggle(questioning_user,answering_user):
     answering_user = temp
     return questioning_user,answering_user
     
-def getUser():
-    return 'A','B'
-
-#def getCategory():
-#    category = {'A':{'birthday':0,'name':0,'education':0,'favourite_athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'favourite_team':0},'B':{'birthday':0,'name':0,'education':0,'favourite_athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'favourite_team':0}}
-#    return category
-
 def getNextQuestionAndCategory():
     #global GLOBAL
     global semanticDictionary
@@ -61,27 +61,47 @@ def getNextQuestionAndCategory():
  
 def start():
     global category
-    user_1, user_2 = getUser()
+    #user_1, user_2 = getUser()
     startup_question = "What is your name?"
     current_question = startup_question
+    previous_question_category = ""
     current_question_category = "name"
     
-    questioning_user = user_1
-    answering_user = user_2
+    questioning_user = USER_A
+    answering_user = USER_B
     print(questioning_user + " : " + current_question)
+    previousAnswer = ""
     while(1):
         answer = getAnswer(current_question,answering_user)
-        time.sleep(1)
         category[questioning_user][current_question_category] = 1
         if category[answering_user][current_question_category] == 1:
             current_question,current_question_category = getNextQuestionAndCategory()
         if current_question == "end":
             print(answering_user + " : " + answer)
             break
-        print(answering_user + " : " + answer + ", "+current_question)
+        
+        #if (previous_question_category == current_question_category and answer != previousAnswer):
+        #    answerPart = current_question.split('your')
+        #    NewAnswer = 'My ' + answerPart[1] + ' is '+answer + 'too'
+        #    print(answering_user + " : " + NewAnswer + ", "+ current_question)
+        #else:
+        if answer:
+            print(answering_user + " : " + answer + ", "+ current_question)
+        else:
+            print(answering_user + " : " + current_question)
+            time.sleep(1)
+        previous_question_category = current_question_category 
+        previousAnswer = answer
         questioning_user,answering_user = toggle(questioning_user,answering_user)
 
 if __name__=="__main__":
+    USER_A = ""
+    USER_B = ""
+    USER_A = raw_input('Enter The First User : ')
+    USER_B = raw_input('Enter The Second User : ')
+    category = {}
+    category[USER_A] = copy.copy(flagDict)
+    category[USER_B] = copy.copy(flagDict)
     start()
 
 
