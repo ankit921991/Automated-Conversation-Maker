@@ -2,6 +2,11 @@ import sys
 import os
 import re
 
+
+
+schemaDict = {'PERSON' : ['name' , 'birthday', 'hometown', 'location'],'EDUCATION':['name' , 'school_name', 'school_type', 'school_year'],'ATHLETE' :['name', 'athlete'],'TEAM' :['name'  , 'team'],'SPORT' :['name'  , 'sports'], 'MUSIC' :['name'  , 'category' , 'music'],'BOOKS' :['name'  , 'category' , 'books'],'MOVIES' :['name'  , 'category' , 'movie'],'INS_PEOPLE' :['name'  , 'people']}
+
+
 ##call the stanford dependancy parser and return the result
 def parseFile(filename):
     outfile = 'out.txt'
@@ -16,15 +21,15 @@ def getEquivalent(key):
     ##return key
     
     ##synonym list for books
-    books = ['book','novel']
+    books = ['book','novel','books']
     ##synonym list for sports
-    sports = ['game','sport']
+    sports = ['game','sport','sports']
     ##synonym list for movies
-    movies = ['film','movie']
+    movies = ['film','movie','movies']
     ##synonym list for music
-    musics  = ['song','music']
+    music  = ['song','music']
     ##synonym list for favorite_athlete
-    favorite_athlete = ['player','athlete']
+    favorite_athlete = ['player','athlete','favorite_athlete']
     
     ##check for books category
     for keys in books:
@@ -39,7 +44,7 @@ def getEquivalent(key):
     ##check for movies category    
     for keys in movies:
         if keys in key:
-            return 'moview'
+            return 'movie'
         
     ##check for music category
     for keys in music:
@@ -49,7 +54,7 @@ def getEquivalent(key):
     ##check for favorite_athlete category
     for keys in favorite_athlete:
         if keys in key:
-            return 'favorite_athlete'
+            return 'athlete'
     
 #------------------------------------------------------------------------------------------------
 
@@ -57,24 +62,38 @@ def getEquivalent(key):
 ##this function will return query for the questions starting from what
 ##Ex : what is your name?
 def extractWhat(lines,question,user):
+    tableNames = ['PERSON', 'EDUCATION', 'ATHLETE', 'TEAM', 'SPORT', 'MUSIC', 'BOOKS', 'MOVIES', 'INS_PEOPLE']
     nn = ""  
     nsubj = ""
     #print(lines)
     #lines = lines.split()
     for line in lines:
-        print(line)
+        #print(line)
         if 'nsubj' in line:
             nsubj = line[13:len(line)-4]
             #print(nsubj)
         if 'nn' in line:
-            nn = line[10:len(line)-3]
+            nn = line[10:len(line)-4]
     ##key = getEquivalent(nsubj +" " + nn)
-    key = nsubj + nn
-    return('select ' + key + ' from table where username = ' + user)
+    #key = nsubj + nn
+    if nn:
+        key = nn +'_'+nsubj
+    else:
+        key = nsubj
+    key = re.sub('\s+','',key)
+    resultQueries = []
+    for tableName,columnNameList in schemaDict.items():
+        for columns in columnNameList:
+            if key == columns:  
+                query = 'select ' + key + ' from '+ '\''+tableName+'\'' +' where name = ' + '\''+user+'\''
+                resultQueries.append(query)
+                break
+    return(resultQueries)
         
 ##this function will return query for the questions starting from who
 ##Ex : who is your favorite athlete?
 def extractWho(lines,question,user):
+    tableNames = ['PERSON', 'EDUCATION', 'ATHLETE', 'TEAM', 'SPORT', 'MUSIC', 'BOOKS', 'MOVIES', 'INS_PEOPLE']
     amod = ""
     nsubj = ""
     amod = key = ""
@@ -88,16 +107,24 @@ def extractWho(lines,question,user):
             amod = line[(5+l):len(line)-4]
     key = getEquivalent(amod+"_"+nsubj)
     ##key = amod + "_" + nsubj
-    return('select ' + key + ' from table where username = ' + user)
+    resultQueries = []
+    for tableName,columnNameList in schemaDict.items():
+        for columns in columnNameList:
+            if key == columns:  
+                query = 'select ' + key + ' from '+ '\''+tableName+'\'' +' where name = ' + '\''+user+'\''
+                resultQueries.append(query)
+                break
+    return(resultQueries)
     
 ##this function will return query for the questions starting from which
 ##Ex : which book do you like?
 ##Ex : which is your favorite book?
 def extractWhich(lines,question,user):
+    tableNames = ['PERSON', 'EDUCATION', 'ATHLETE', 'TEAM', 'SPORT', 'MUSIC', 'BOOKS', 'MOVIES', 'INS_PEOPLE']
     det= ""
     amod = ""
     key = ""
-    print(lines)
+    #print(lines)
     for line in lines:
         line = re.sub('\n','',line)
         if 'det' in line:
@@ -114,7 +141,15 @@ def extractWhich(lines,question,user):
         key = getEquivalent(amod)
     elif amod=="":
         key = getEquivalent(det)
-    return('select ' + key + ' from table where username = ' + user)
+        
+    resultQueries = []
+    for tableName,columnNameList in schemaDict.items():
+        for columns in columnNameList:
+            if key == columns:  
+                query = 'select ' + key + ' from '+ '\''+tableName+'\'' +' where name = ' + '\''+user+'\''
+                resultQueries.append(query)
+                break
+    return(resultQueries)
 
 ##this function will return query for the questions starting from which
 #def extractwhere(lines,question,user):
@@ -123,7 +158,13 @@ def extractWhich(lines,question,user):
 
 ##this is to extract query depending upon whether question is starting from what, where, who, when, why
 ##which etc. This can be expanded as the scope of the project expands
-def extractQuery(lines,question,user):
+def extractQuery(question,user):
+    f = open('temp.txt','w')
+    f.write(question)
+    f.close()
+    outfile = parseFile('temp.txt')
+    f = open(outfile,'r')
+    lines = f.readlines()
     question_list = question.split()
     if question_list[0].lower()=="where":
         return(extractWhere(lines,question,user))
@@ -142,12 +183,14 @@ if __name__ == "__main__":
         sys.exit(0)
     question = sys.argv[1]
     user = sys.argv[2]
+    '''
     f = open('temp.txt','w')
     f.write(question)
     f.close()
     outfile = parseFile('temp.txt')
     f = open(outfile,'r')
     lines = f.readlines()
-    query = extractQuery(lines,question,user)
+    '''
+    query = extractQuery(question,user)
     print(query)
     #executeQuery(query)
