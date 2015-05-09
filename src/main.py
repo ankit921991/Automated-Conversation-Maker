@@ -26,13 +26,20 @@ def getAnswer(current_question,questioning_user):
     #return querySet
     
 def toggle(questioning_user,answering_user):
+    """
+    This function toggles the the user who is currently answering the question with the user who is currently asking the question. It simply swaps the answering user with the questioning user
+    """
     temp = questioning_user
     questioning_user = answering_user
     answering_user = temp
     return questioning_user,answering_user
     
 def getNextQuestionAndCategory():
-    #global GLOBAL
+    """
+    We have different categories like movie, sport, music. This function chooses the category which is not covered till now and checks whether the semantic type of the category is person or entity and accordingly create question for the same category. This function returns the new question and category.
+    Example: If the category which is not used till now is home town this function checks for its semantic type which is entity hence the next question prepared is :: what is your hometown?
+    """
+    
     global semanticDictionary
     global category
     current_category = ""
@@ -55,11 +62,12 @@ def getNextQuestionAndCategory():
         if semanticDictionary[current_category] == 'adj_entity':
             current_question = 'which is your favourite ' + current_category+' ?'
             return current_question,current_category
-        
-##def getAnswer(current_question,answering_user):
-##    return 'answer'
- 
+
 def start():
+    """
+    This is the starter program which runs the main Algorithm. The algorithm developed is as follows :: 
+    DEVELOPE THE ALGORITHM
+    """
     global category
     #user_1, user_2 = getUser()
     startup_question = "What is your name?"
@@ -95,6 +103,9 @@ def start():
         questioning_user,answering_user = toggle(questioning_user,answering_user)
 
 if __name__=="__main__":
+    """
+    This is the main function. It takes as input two users and builds the category dictionary for both the users. This then call start function
+    """
     USER_A = ""
     USER_B = ""
     USER_A = raw_input('Enter The First User : ')
