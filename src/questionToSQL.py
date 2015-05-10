@@ -2,23 +2,21 @@ import sys
 import os
 import re
 
-
-
 schemaDict = {'PERSON' : ['name' , 'birthday', 'hometown', 'location'],'EDUCATION':['name' , 'school_name', 'school_type', 'school_year'],'ATHLETE' :['name', 'athlete'],'TEAM' :['name'  , 'team'],'SPORT' :['name'  , 'sports'], 'MUSIC' :['name'  , 'category' , 'music'],'BOOKS' :['name'  , 'category' , 'books'],'MOVIES' :['name'  , 'category' , 'movie'],'INS_PEOPLE' :['name'  , 'people']}
 
-
-##call the stanford dependancy parser and return the result
 def parseFile(filename):
+    """
+    This function uses JAVA API for stanford dependacy parser to parse the question and produce typed dependacies. These dependacies can be latter use to extract the important information from the question such as subject, object type of question etc.
+    """
     outfile = 'out.txt'
     command = r'java -mx1200m -cp "/home/ankit/Desktop/stanford-parser-full-2015-01-30/stanford-parser.jar:" edu.stanford.nlp.parser.lexparser.LexicalizedParser -outputFormat "typedDependencies" /home/ankit/Desktop/stanford-parser-full-2015-01-30/stanford-parser-3.5.1-models/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz ' + filename +' > '+outfile #command to use stanford parser 
-    os.system(command) ##execute command
+    os.system(command) 
     return outfile
 
-
-##this function is for future purpose. In future if we need to map from the key to its meaning and 
-##then to the field in database then this function can be used
 def getEquivalent(key):
-    ##return key
+    """
+    A single word can have multiple synonym Example athlete can be called player, sportsperson etc. in the question these various synonyms can be used but the database table has only one name Example: table for athelete is Athlete. So, even though different synonym are used the query shuold be for a single table. This function simply returns the equivalent word for the given key.
+    """
     
     ##synonym list for books
     books = ['book','novel','books']
@@ -62,6 +60,9 @@ def getEquivalent(key):
 ##this function will return query for the questions starting from what
 ##Ex : what is your name?
 def extractWhat(lines,question,user):
+    """
+    This question takes as input the output of dependancy parser, question and user to which question is asked for all the questions starting with what. It returns the SQL statement to retrieve the respective data from the database.
+    """
     tableNames = ['PERSON', 'EDUCATION', 'ATHLETE', 'TEAM', 'SPORT', 'MUSIC', 'BOOKS', 'MOVIES', 'INS_PEOPLE']
     nn = ""  
     nsubj = ""
@@ -93,6 +94,9 @@ def extractWhat(lines,question,user):
 ##this function will return query for the questions starting from who
 ##Ex : who is your favorite athlete?
 def extractWho(lines,question,user):
+    """
+    This question takes as input the output of dependancy parser, question and user to which question is asked for all the questions starting with who. It returns the SQL statement to retrieve the respective data from the database.
+    """
     tableNames = ['PERSON', 'EDUCATION', 'ATHLETE', 'TEAM', 'SPORT', 'MUSIC', 'BOOKS', 'MOVIES', 'INS_PEOPLE']
     amod = ""
     nsubj = ""
@@ -120,6 +124,9 @@ def extractWho(lines,question,user):
 ##Ex : which book do you like?
 ##Ex : which is your favorite book?
 def extractWhich(lines,question,user):
+    """
+    This question takes as input the output of dependancy parser, question and user to which question is asked for all the questions starting with which. It returns the SQL statement to retrieve the respective data from the database.
+    """
     tableNames = ['PERSON', 'EDUCATION', 'ATHLETE', 'TEAM', 'SPORT', 'MUSIC', 'BOOKS', 'MOVIES', 'INS_PEOPLE']
     det= ""
     amod = ""
@@ -159,6 +166,9 @@ def extractWhich(lines,question,user):
 ##this is to extract query depending upon whether question is starting from what, where, who, when, why
 ##which etc. This can be expanded as the scope of the project expands
 def extractQuery(question,user):
+    """
+    This function check for the  question type i.e whether question is starting from what, who or which and depending on the question type calls extractWhat, extractWho or extractWhich respectively.
+    """
     f = open('temp.txt','w')
     f.write(question)
     f.close()
@@ -183,14 +193,6 @@ if __name__ == "__main__":
         sys.exit(0)
     question = sys.argv[1]
     user = sys.argv[2]
-    '''
-    f = open('temp.txt','w')
-    f.write(question)
-    f.close()
-    outfile = parseFile('temp.txt')
-    f = open(outfile,'r')
-    lines = f.readlines()
-    '''
     query = extractQuery(question,user)
     print(query)
     #executeQuery(query)
