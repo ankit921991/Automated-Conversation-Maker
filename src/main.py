@@ -6,9 +6,10 @@ c = conn.cursor()
 from questionToSQL import extractQuery  
 import copy
 
+
 GLOBAL = 0
-semanticDictionary = {'birthday':'entity','name':'entity','education':'entity','athletes':'person','hometown':'entity','music':'adj_entity','sports':'adj_entity','books':'adj_entity','movies':'adj_entity','team':'adj_entity'}
-flagDict = {'birthday':0,'name':0,'education':0,'athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'team':0} 
+semanticDictionary = {'birthday':'entity','name':'entity','school name':'entity','athletes':'person','hometown':'entity','music':'adj_entity','sports':'adj_entity','books':'adj_entity','movies':'adj_entity','team':'adj_entity'}
+flagDict = {'birthday':0,'name':0,'school name':0,'athletes':0,'hometown':0,'music':0,'sports':0,'books':0,'movies':0,'team':0} 
 
 
 def getAnswer(current_question,questioning_user):
@@ -17,7 +18,7 @@ def getAnswer(current_question,questioning_user):
     """
     querySet = extractQuery(current_question,questioning_user) 
     for query in querySet:
-        print(query)
+        #print(query)
         resultSet = c.execute(query)
         result = resultSet.fetchone() 
         if result :
@@ -59,11 +60,15 @@ def getNextQuestionAndCategory():
         if semanticDictionary[current_category] == 'person':
             current_question = 'who is your ' + current_category+' ?'
             return current_question,current_category
+        #if semanticDictionary[current_category] == 'adj_person':
+        #    current_question = 'who is your favorite ' + current_category+' ?'
+        #    return current_question,current_category
         if semanticDictionary[current_category] == 'adj_entity':
             current_question = 'which is your favourite ' + current_category+' ?'
             return current_question,current_category
 
 def start():
+    result=[]
     """
     This is the starter program which runs the main Algorithm. The algorithm developed is as follows :: 
     DEVELOPE THE ALGORITHM
@@ -71,20 +76,25 @@ def start():
     global category
     #user_1, user_2 = getUser()
     startup_question = "What is your name?"
+    
     current_question = startup_question
     previous_question_category = ""
+    previousAnswer = ""    
     current_question_category = "name"
-    
     questioning_user = USER_A
     answering_user = USER_B
     print(questioning_user + " : " + current_question)
+    result.append(questioning_user + " : " + current_question)
     previousAnswer = ""
     while(1):
         answer = getAnswer(current_question,answering_user)
         category[questioning_user][current_question_category] = 1
+        #previous_question_category = current_question_category
+        #previousAnswer = answer
         if category[answering_user][current_question_category] == 1:
             current_question,current_question_category = getNextQuestionAndCategory()
-        if current_question == "end":
+        if current_question == "end" and answer:
+            result.append(answering_user + " : " + answer)
             print(answering_user + " : " + answer)
             break
         
@@ -95,12 +105,13 @@ def start():
         #else:
         if answer:
             print(answering_user + " : " + answer + ", "+ current_question)
+            result.append(answering_user + " : " + answer + ", "+ current_question)
         else:
+            result.append(answering_user + " : " + current_question)    
             print(answering_user + " : " + current_question)
-            time.sleep(1)
-        previous_question_category = current_question_category 
-        previousAnswer = answer
+        #time.sleep(1)
         questioning_user,answering_user = toggle(questioning_user,answering_user)
+    return result
 
 if __name__=="__main__":
     """
@@ -113,7 +124,16 @@ if __name__=="__main__":
     category = {}
     category[USER_A] = copy.copy(flagDict)
     category[USER_B] = copy.copy(flagDict)
-    start()
+    result = []
+    result = start()
+    iterator = 0
+    print("*************************CONVERSATION******************************")
+    for entry in result:
+        print(entry)
+        iterator+=1
+        if iterator%2 == 0:
+            time.sleep(5)
+    
 
 
 
