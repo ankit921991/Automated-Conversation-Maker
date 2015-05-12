@@ -13,10 +13,10 @@ Install the Stanford NLTK. The NLTK and installation guidlines can be found at h
 Download stanford dependancy parser from link below		
 http://nlp.stanford.edu/software/lex-parser.shtml		
 
-After downloading stanford dependancy parser follow the steps below<b>		
+<b>After downloading stanford dependancy parser follow the steps below<b>		
 1) Locate the src folder in the repository		 
 2) On line number 12 there is a following code		
 
 command = r'java -mx1200m -cp "Path_to/stanford-parser.jar:" edu.stanford.nlp.parser.lexparser.LexicalizedParser -outputFormat "typedDependencies" <path to>/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz ' + input_file_name +' > '+output_file_name 
-#### 3) 
+
 
