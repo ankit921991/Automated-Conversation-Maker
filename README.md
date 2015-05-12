@@ -28,6 +28,6 @@ https://www.sqlite.org/download.html
 
 
 <b>3) Use the following command to run the program		
-<b> <t>_python_ _main.py_
+<b> 			_python_ _main.py_
 
 
