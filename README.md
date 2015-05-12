@@ -13,7 +13,8 @@ Install the Stanford NLTK. The NLTK and installation guidlines can be found at h
 Download stanford dependancy parser from link below		
 http://nlp.stanford.edu/software/lex-parser.shtml		
 
-<b>After downloading stanford dependancy parser follow the steps below<b>		
+<b>After downloading stanford dependancy parser follow the steps below			
+
 1) Locate the src folder in the repository		 
 2) On line number 12 there is a following code		
 
