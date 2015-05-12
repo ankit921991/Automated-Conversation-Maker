@@ -6,14 +6,16 @@ As the name suggest this project tries to implement virtual agents who can commu
 
 ### Installation and Setup
 
-#### 1) Install NLTK
+#### 1) Install NLTK		
 Install the Stanford NLTK. The NLTK and installation guidlines can be found at http://www.nltk.org/install.html		
 
 #### 2) Download Stanford Dependancy Parser
 Download stanford dependancy parser from link below		
 http://nlp.stanford.edu/software/lex-parser.shtml		
 
-after installation follow the following steps		
-1)
+After downloading stanford dependancy parser follow the steps below		
+1) Locate the src folder in the repository 
+2) On line number 12 there is a following code
+command = r'java -mx1200m -cp "<Path to>/stanford-parser.jar:" edu.stanford.nlp.parser.lexparser.LexicalizedParser -outputFormat "typedDependencies" <path to>/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz ' + filename +' > '+outfile 
 #### 3) 
 
