@@ -21,6 +21,6 @@ http://nlp.stanford.edu/software/lex-parser.shtml
 command = r'java -mx1200m -cp "Path_to/stanford-parser.jar:" edu.stanford.nlp.parser.lexparser.LexicalizedParser -outputFormat "typedDependencies" <path to>/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz ' + input_file_name +' > '+output_file_name 
 
 <b>3) Use the following command to run the program		
-<b>_python_ _main.py_
+<b>  _python_ _main.py_
 
 
