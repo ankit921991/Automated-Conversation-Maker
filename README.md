@@ -18,7 +18,14 @@ http://nlp.stanford.edu/software/lex-parser.shtml
 <b>1) Locate the src folder in the repository		 
 <b>2) On line number 12 there is a following code		
 
-command = r'java -mx1200m -cp "Path_to/stanford-parser.jar:" edu.stanford.nlp.parser.lexparser.LexicalizedParser -outputFormat "typedDependencies" <path to>/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz ' + input_file_name +' > '+output_file_name 
+command = r'java -mx1200m -cp "_Path__to_/stanford-parser.jar:" edu.stanford.nlp.parser.lexparser.LexicalizedParser -outputFormat "typedDependencies" _path__to_/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz ' + filename +' > '+outfile 
+
+replace _Path__to_ with respective pths		
+
+#### 3) Download and install Sqlite3
+Dowanload and install sqlite3. Use the following link for download and installation guidlines		
+https://www.sqlite.org/download.html		
+
 
 <b>3) Use the following command to run the program		
 <b>  _python_ _main.py_
